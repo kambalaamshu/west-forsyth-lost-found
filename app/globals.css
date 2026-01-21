@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #212661;
+  --gold: #cec481;
+  --green: #234d1e;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  color: #333333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  color: var(--navy);
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-navy text-gold font-bold py-3 px-6 rounded-lg transition-all hover:bg-opacity-90 hover:-translate-y-0.5 font-poppins;
+  }
+
+  .btn-secondary {
+    @apply bg-green text-white font-bold py-3 px-6 rounded-lg transition-all hover:bg-opacity-90 hover:-translate-y-0.5 font-poppins;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border-2 border-medium-gray rounded-lg focus:outline-none focus:border-gold transition-colors;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-all;
+  }
+}
