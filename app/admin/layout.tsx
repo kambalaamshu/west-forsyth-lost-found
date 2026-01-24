@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ClipboardList, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Package, ClipboardList, LogOut, Menu, X, Search } from 'lucide-react'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -40,6 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/items', label: 'Items', icon: Package },
     { href: '/admin/claims', label: 'Claims', icon: ClipboardList },
+    { href: '/admin/searches', label: 'Lost Searches', icon: Search },
   ]
 
   if (!isAuthenticated) {
