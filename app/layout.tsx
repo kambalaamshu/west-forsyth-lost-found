@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'West Forsyth Lost & Found',
+  title: 'Where at West - Lost & Found',
   description: 'Lost and Found portal for West Forsyth High School students',
 }
 

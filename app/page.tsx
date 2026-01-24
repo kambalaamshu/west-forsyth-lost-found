@@ -145,7 +145,7 @@ export default function Home() {
       <footer className="bg-navy text-white py-8 px-4 mt-16">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-gray-300">
-            © 2026 West Forsyth High School Lost & Found
+            © 2026 Where at West - Lost & Found
           </p>
           <p className="text-gold mt-2">
             Helping Wolverines find their way back home

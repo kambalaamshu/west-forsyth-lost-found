@@ -22,10 +22,10 @@ export default function Navigation() {
           {/* Logo and Brand */}
           <Link href="/" className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gold rounded-lg flex items-center justify-center font-bold text-navy text-xl">
-              WF
+              WW
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">West Forsyth</h2>
+              <h2 className="text-xl font-bold text-white">Where at West</h2>
               <p className="text-gold text-sm">Lost & Found</p>
             </div>
           </Link>

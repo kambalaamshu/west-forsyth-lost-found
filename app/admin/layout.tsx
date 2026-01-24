@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-navy mb-2">Admin Login</h1>
-            <p className="text-gray-600">West Forsyth Lost & Found</p>
+            <p className="text-gray-600">Where at West - Lost & Found</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
