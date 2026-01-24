@@ -2,7 +2,18 @@
 
 import { useState } from 'react'
 import Navigation from '@/components/Navigation'
-import { Upload, CheckCircle, AlertCircle } from 'lucide-react'
+import { Upload, CheckCircle, AlertCircle, Sparkles, X, Loader2 } from 'lucide-react'
+
+// Analysis result interface matching the server-side API
+interface ImageAnalysisResult {
+  tags: string[]
+  objects: string[]
+  colors: string[]
+  detectedText: string[]
+  confidence: number
+  suggestedCategory?: string
+  warning?: string
+}
 
 const categories = [
   { value: 'Bags', label: 'Backpack/Bag' },
@@ -36,9 +47,16 @@ const colors = ['Navy Blue', 'Gold/Yellow', 'Green', 'Black', 'Red', 'White', 'G
 
 export default function ReportPage() {
   const [photos, setPhotos] = useState<File[]>([])
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // AI Analysis state
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<ImageAnalysisResult | null>(null)
+  const [aiTags, setAiTags] = useState<string[]>([])
+  const [detectedText, setDetectedText] = useState<string[]>([])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -55,10 +73,63 @@ export default function ReportPage() {
     deliveryAgreed: false,
   })
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
       const filesArray = Array.from(e.target.files).slice(0, 5)
       setPhotos(filesArray)
+
+      // Create preview for first image
+      const previewUrl = URL.createObjectURL(filesArray[0])
+      setPhotoPreview(previewUrl)
+
+      // Run AI analysis on first image using server-side Google Cloud Vision
+      setAnalyzing(true)
+      setAnalysisResult(null)
+      setAiTags([])
+      setDetectedText([])
+
+      try {
+        // Call server-side API for Google Cloud Vision analysis
+        const analyzeFormData = new FormData()
+        analyzeFormData.append('file', filesArray[0])
+
+        const response = await fetch('/api/analyze-image', {
+          method: 'POST',
+          body: analyzeFormData,
+        })
+
+        if (!response.ok) {
+          throw new Error('Analysis failed')
+        }
+
+        const result: ImageAnalysisResult = await response.json()
+        setAnalysisResult(result)
+        setAiTags(result.tags)
+        setDetectedText(result.detectedText)
+
+        // Auto-fill colors if detected
+        if (result.colors.length > 0) {
+          const matchedColors = result.colors.filter(c =>
+            colors.some(color => color.toLowerCase().includes(c.toLowerCase()) || c.toLowerCase().includes(color.toLowerCase()))
+          )
+          if (matchedColors.length > 0) {
+            setFormData(prev => ({
+              ...prev,
+              selectedColors: Array.from(new Set([...prev.selectedColors, ...matchedColors]))
+            }))
+          }
+        }
+
+        // Use suggested category from API if available
+        if (result.suggestedCategory && result.suggestedCategory !== 'Other' && !formData.category) {
+          setFormData(prev => ({ ...prev, category: result.suggestedCategory! }))
+        }
+
+      } catch (err) {
+        console.error('Image analysis failed:', err)
+      } finally {
+        setAnalyzing(false)
+      }
     }
   }
 
@@ -102,6 +173,9 @@ export default function ReportPage() {
       // Build the color string
       const colorString = formData.selectedColors.join(', ')
 
+      // Combine AI tags and detected text
+      const allTags = [...aiTags, ...detectedText].join(', ')
+
       // Create the item payload
       const payload = {
         type: 'found' as const,
@@ -112,6 +186,7 @@ export default function ReportPage() {
         location: fullLocation,
         date_found: formData.dateFound,
         image_url: imageUrl,
+        ai_tags: allTags || null,
         contact_name: formData.contactName || 'Anonymous',
         contact_email: formData.contactEmail || 'lostandfound@westforsyth.edu',
       }
@@ -230,15 +305,126 @@ export default function ReportPage() {
 
               {photos.length > 0 && (
                 <div className="mt-4">
-                  <p className="font-semibold mb-2">
-                    {photos.length} photo{photos.length > 1 ? 's' : ''} selected
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {photos.map((photo, index) => (
-                      <div key={index} className="bg-white px-3 py-2 rounded-lg text-sm">
-                        {photo.name}
+                  <div className="flex flex-wrap gap-4 items-start">
+                    {/* Image Preview */}
+                    {photoPreview && (
+                      <div className="relative">
+                        <img
+                          src={photoPreview}
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded-lg border-2 border-gold"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPhotos([])
+                            setPhotoPreview(null)
+                            setAnalysisResult(null)
+                            setAiTags([])
+                            setDetectedText([])
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X size={14} />
+                        </button>
                       </div>
-                    ))}
+                    )}
+
+                    {/* AI Analysis Results */}
+                    <div className="flex-1">
+                      {analyzing ? (
+                        <div className="flex items-center gap-2 text-navy">
+                          <Loader2 className="animate-spin" size={20} />
+                          <span className="font-semibold">Analyzing image with Google Cloud Vision...</span>
+                        </div>
+                      ) : analysisResult && (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-green font-semibold">
+                            <Sparkles size={20} />
+                            <span>AI Analysis Complete!</span>
+                            {analysisResult.confidence > 0 && (
+                              <span className="text-sm text-gray-500">({analysisResult.confidence}% confidence)</span>
+                            )}
+                          </div>
+
+                          {/* Warning if Vision API not configured */}
+                          {analysisResult.warning && (
+                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded text-sm text-yellow-800">
+                              {analysisResult.warning}
+                            </div>
+                          )}
+
+                          {/* Detected Tags */}
+                          {aiTags.length > 0 && (
+                            <div>
+                              <p className="text-sm font-semibold text-gray-600 mb-1">Detected Objects:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {aiTags.map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="bg-navy/10 text-navy px-3 py-1 rounded-full text-sm flex items-center gap-1"
+                                  >
+                                    {tag}
+                                    <button
+                                      type="button"
+                                      onClick={() => setAiTags(aiTags.filter((_, i) => i !== idx))}
+                                      className="hover:text-red-500"
+                                    >
+                                      <X size={12} />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Detected Text (OCR) */}
+                          {detectedText.length > 0 && (
+                            <div>
+                              <p className="text-sm font-semibold text-gray-600 mb-1">Detected Text (Names/Labels):</p>
+                              <div className="flex flex-wrap gap-2">
+                                {detectedText.map((text, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="bg-gold/20 text-navy px-3 py-1 rounded-full text-sm flex items-center gap-1"
+                                  >
+                                    "{text}"
+                                    <button
+                                      type="button"
+                                      onClick={() => setDetectedText(detectedText.filter((_, i) => i !== idx))}
+                                      className="hover:text-red-500"
+                                    >
+                                      <X size={12} />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Detected Colors */}
+                          {analysisResult.colors.length > 0 && (
+                            <div>
+                              <p className="text-sm font-semibold text-gray-600 mb-1">Detected Colors:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {analysisResult.colors.map((color, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+                                  >
+                                    {color}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <p className="text-sm text-gray-500 mt-2">
+                        {photos.length} photo{photos.length > 1 ? 's' : ''} selected: {photos.map(p => p.name).join(', ')}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}

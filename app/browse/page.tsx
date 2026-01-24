@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Navigation from '@/components/Navigation'
-import { Search, MapPin, Calendar, Palette, Package, X, CheckCircle } from 'lucide-react'
+import { Search, MapPin, Calendar, Palette, Package, X, CheckCircle, Tag, Loader2 } from 'lucide-react'
 
 interface Item {
   id: number
@@ -15,6 +15,7 @@ interface Item {
   location: string
   date_found: string
   image_url: string | null
+  ai_tags: string | null
   contact_name: string | null
   contact_email: string | null
   status: string
@@ -32,9 +33,10 @@ const categoryIcons: Record<string, string> = {
   'Other': '📦',
 }
 
-export default function BrowsePage() {
+function BrowsePageContent() {
   const searchParams = useSearchParams()
   const initialQuery = searchParams.get('q') || ''
+  const claimItemId = searchParams.get('claim')
 
   const [items, setItems] = useState<Item[]>([])
   const [categories, setCategories] = useState<string[]>([])
@@ -62,6 +64,16 @@ export default function BrowsePage() {
 
         setItems(itemsData)
         setCategories(statsData.categories || [])
+
+        // If claim parameter is present, find the item and open claim modal
+        if (claimItemId) {
+          const itemToClaimId = parseInt(claimItemId, 10)
+          const itemToClaim = itemsData.find((item: Item) => item.id === itemToClaimId)
+          if (itemToClaim) {
+            setClaimItem(itemToClaim)
+            setShowClaimModal(true)
+          }
+        }
       } catch (error) {
         console.error('Failed to fetch data:', error)
       } finally {
@@ -70,17 +82,18 @@ export default function BrowsePage() {
     }
 
     fetchData()
-  }, [])
+  }, [claimItemId])
 
   // Get unique colors from items
-  const availableColors = [...new Set(items.map(item => item.color).filter(Boolean))] as string[]
+  const availableColors = Array.from(new Set(items.map(item => item.color).filter(Boolean))) as string[]
 
   // Filter items
   const filteredItems = items.filter(item => {
     const matchesSearch = searchTerm === '' ||
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.location.toLowerCase().includes(searchTerm.toLowerCase())
+      item.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.ai_tags?.toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesCategory = selectedCategories.length === 0 ||
       selectedCategories.includes(item.category)
@@ -288,6 +301,21 @@ export default function BrowsePage() {
                             <Package size={14} /> {item.category}
                           </p>
                         </div>
+
+                        {/* AI Tags */}
+                        {item.ai_tags && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {item.ai_tags.split(', ').slice(0, 3).map((tag, idx) => (
+                              <span
+                                key={idx}
+                                className="bg-navy/10 text-navy text-xs px-2 py-0.5 rounded-full flex items-center gap-1"
+                              >
+                                <Tag size={10} />
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
 
                         <button
                           className="mt-4 w-full bg-navy text-gold font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors"
@@ -533,5 +561,34 @@ export default function BrowsePage() {
         </div>
       )}
     </div>
+  )
+}
+
+// Loading fallback for Suspense
+function BrowseLoading() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      <div className="bg-navy text-white py-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4 text-white">Browse Found Items</h1>
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="text-center py-16">
+          <Loader2 className="animate-spin h-12 w-12 mx-auto mb-4 text-navy" />
+          <p className="text-gray-500">Loading items...</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Export page with Suspense wrapper
+export default function BrowsePage() {
+  return (
+    <Suspense fallback={<BrowseLoading />}>
+      <BrowsePageContent />
+    </Suspense>
   )
 }

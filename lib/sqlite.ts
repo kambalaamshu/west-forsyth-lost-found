@@ -47,6 +47,13 @@ function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_items_date ON items(date_found);
   `)
 
+  // Add ai_tags column if it doesn't exist (migration for existing databases)
+  try {
+    database.exec(`ALTER TABLE items ADD COLUMN ai_tags TEXT`)
+  } catch {
+    // Column already exists, ignore error
+  }
+
   // Create contacts table for contact form submissions
   database.exec(`
     CREATE TABLE IF NOT EXISTS contacts (
@@ -82,6 +89,28 @@ function initSchema() {
   database.exec(`
     CREATE INDEX IF NOT EXISTS idx_claims_status ON claims(status);
     CREATE INDEX IF NOT EXISTS idx_claims_item ON claims(item_id);
+  `)
+
+  // Create lost_searches table for tracking search history
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS lost_searches (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      searcher_email TEXT NOT NULL,
+      description TEXT NOT NULL,
+      ai_tags TEXT,
+      colors TEXT,
+      category TEXT,
+      matched_item_id INTEGER,
+      notification_sent INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (matched_item_id) REFERENCES items(id)
+    )
+  `)
+
+  // Create index for lost_searches
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_lost_searches_email ON lost_searches(searcher_email);
+    CREATE INDEX IF NOT EXISTS idx_lost_searches_created ON lost_searches(created_at);
   `)
 
   // Seed with sample data if table is empty
@@ -215,6 +244,7 @@ export interface Item {
   location: string
   date_found: string
   image_url: string | null
+  ai_tags: string | null
   contact_name: string | null
   contact_email: string | null
   status: 'active' | 'claimed' | 'expired'
@@ -231,6 +261,7 @@ export interface CreateItemInput {
   location: string
   date_found: string
   image_url?: string
+  ai_tags?: string
   contact_name?: string
   contact_email?: string
 }
@@ -256,9 +287,9 @@ export function searchItems(query: string): Item[] {
   return database.prepare(`
     SELECT * FROM items
     WHERE status = 'active'
-    AND (title LIKE ? OR description LIKE ? OR category LIKE ? OR color LIKE ? OR location LIKE ?)
+    AND (title LIKE ? OR description LIKE ? OR category LIKE ? OR color LIKE ? OR location LIKE ? OR ai_tags LIKE ?)
     ORDER BY date_found DESC
-  `).all(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm) as Item[]
+  `).all(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm) as Item[]
 }
 
 export function getItemsByCategory(category: string): Item[] {
@@ -279,13 +310,14 @@ export function createItem(item: CreateItemInput): Item {
     location: item.location,
     date_found: item.date_found,
     image_url: item.image_url ?? null,
+    ai_tags: item.ai_tags ?? null,
     contact_name: item.contact_name ?? null,
     contact_email: item.contact_email ?? null,
   }
 
   const result = database.prepare(`
-    INSERT INTO items (type, title, description, category, color, location, date_found, image_url, contact_name, contact_email)
-    VALUES (@type, @title, @description, @category, @color, @location, @date_found, @image_url, @contact_name, @contact_email)
+    INSERT INTO items (type, title, description, category, color, location, date_found, image_url, ai_tags, contact_name, contact_email)
+    VALUES (@type, @title, @description, @category, @color, @location, @date_found, @image_url, @ai_tags, @contact_name, @contact_email)
   `).run(itemWithDefaults)
 
   return getItemById(result.lastInsertRowid as number)!
@@ -445,4 +477,70 @@ export function deleteClaim(id: number): boolean {
   const database = getDb()
   const result = database.prepare('DELETE FROM claims WHERE id = ?').run(id)
   return result.changes > 0
+}
+
+// Lost Search Types and Functions
+
+export interface LostSearch {
+  id: number
+  searcher_email: string
+  description: string
+  ai_tags: string | null
+  colors: string | null
+  category: string | null
+  matched_item_id: number | null
+  notification_sent: number
+  created_at: string
+}
+
+export interface CreateLostSearchInput {
+  searcher_email: string
+  description: string
+  ai_tags?: string
+  colors?: string
+  category?: string
+}
+
+export function createLostSearch(search: CreateLostSearchInput): LostSearch {
+  const database = getDb()
+
+  const searchWithDefaults = {
+    searcher_email: search.searcher_email,
+    description: search.description,
+    ai_tags: search.ai_tags ?? null,
+    colors: search.colors ?? null,
+    category: search.category ?? null,
+  }
+
+  const result = database.prepare(`
+    INSERT INTO lost_searches (searcher_email, description, ai_tags, colors, category)
+    VALUES (@searcher_email, @description, @ai_tags, @colors, @category)
+  `).run(searchWithDefaults)
+
+  return getLostSearchById(result.lastInsertRowid as number)!
+}
+
+export function getLostSearchById(id: number): LostSearch | undefined {
+  const database = getDb()
+  return database.prepare('SELECT * FROM lost_searches WHERE id = ?').get(id) as LostSearch | undefined
+}
+
+export function updateSearchNotification(id: number, matchedItemId: number): boolean {
+  const database = getDb()
+  const result = database.prepare(`
+    UPDATE lost_searches
+    SET matched_item_id = ?, notification_sent = 1
+    WHERE id = ?
+  `).run(matchedItemId, id)
+  return result.changes > 0
+}
+
+export function getRecentSearchesByEmail(email: string, limit: number = 10): LostSearch[] {
+  const database = getDb()
+  return database.prepare(`
+    SELECT * FROM lost_searches
+    WHERE searcher_email = ?
+    ORDER BY created_at DESC
+    LIMIT ?
+  `).all(email, limit) as LostSearch[]
 }

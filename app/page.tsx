@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Upload, MapPin } from 'lucide-react'
+import { Search, Upload, MapPin, Camera } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -66,6 +66,24 @@ export default function Home() {
           <div className="mt-6 text-gold text-lg">
             {stats.active} items waiting to be reunited with their owners
           </div>
+
+          {/* Quick action buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <Link
+              href="/search"
+              className="inline-flex items-center justify-center gap-2 bg-gold text-navy font-bold py-4 px-8 rounded-lg hover:bg-yellow-400 transition-colors"
+            >
+              <Camera size={24} />
+              I Lost Something
+            </Link>
+            <Link
+              href="/report"
+              className="inline-flex items-center justify-center gap-2 bg-white/20 text-white font-bold py-4 px-8 rounded-lg border-2 border-white/40 hover:bg-white/30 transition-colors"
+            >
+              <Upload size={24} />
+              I Found Something
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -77,45 +95,59 @@ export default function Home() {
             Three simple steps to reunite lost items with their owners
           </p>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="card p-8 text-center hover:scale-105 transition-transform">
-              <div className="w-20 h-20 bg-gold rounded-full flex items-center justify-center mx-auto mb-6">
-                <Upload className="text-navy" size={40} />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Feature 1 - Lost Something */}
+            <div className="card p-6 text-center hover:scale-105 transition-transform border-2 border-gold">
+              <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center mx-auto mb-4">
+                <Camera className="text-navy" size={32} />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Report Found Item</h3>
-              <p className="text-gray-600 mb-6">
-                Found something? Upload photos and details. We&apos;ll help find the owner.
+              <h3 className="text-xl font-bold mb-3">I Lost Something</h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Upload a photo and let AI find your item in our database.
               </p>
-              <Link href="/report" className="btn-secondary inline-block">
+              <Link href="/search" className="btn-primary inline-block text-sm">
+                Find My Item
+              </Link>
+            </div>
+
+            {/* Feature 2 - Report Found */}
+            <div className="card p-6 text-center hover:scale-105 transition-transform">
+              <div className="w-16 h-16 bg-green rounded-full flex items-center justify-center mx-auto mb-4">
+                <Upload className="text-white" size={32} />
+              </div>
+              <h3 className="text-xl font-bold mb-3">I Found Something</h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Report a found item and help reunite it with its owner.
+              </p>
+              <Link href="/report" className="btn-secondary inline-block text-sm">
                 Report Item
               </Link>
             </div>
 
-            {/* Feature 2 */}
-            <div className="card p-8 text-center hover:scale-105 transition-transform">
-              <div className="w-20 h-20 bg-green rounded-full flex items-center justify-center mx-auto mb-6">
-                <Search className="text-white" size={40} />
+            {/* Feature 3 - Search */}
+            <div className="card p-6 text-center hover:scale-105 transition-transform">
+              <div className="w-16 h-16 bg-navy rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="text-gold" size={32} />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Search Database</h3>
-              <p className="text-gray-600 mb-6">
-                Browse all found items with advanced filters by color, location, and date.
+              <h3 className="text-xl font-bold mb-3">Browse All Items</h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Manually search all found items by category and date.
               </p>
-              <Link href="/browse" className="btn-secondary inline-block">
-                Search Now
+              <Link href="/browse" className="btn-secondary inline-block text-sm">
+                Browse
               </Link>
             </div>
 
-            {/* Feature 3 */}
-            <div className="card p-8 text-center hover:scale-105 transition-transform">
-              <div className="w-20 h-20 bg-navy rounded-full flex items-center justify-center mx-auto mb-6">
-                <MapPin className="text-gold" size={40} />
+            {/* Feature 4 - Location */}
+            <div className="card p-6 text-center hover:scale-105 transition-transform">
+              <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MapPin className="text-white" size={32} />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Visit Lost & Found</h3>
-              <p className="text-gray-600 mb-6">
-                Pick up your claimed item at our office. Room 100, Main Office.
+              <h3 className="text-xl font-bold mb-3">Visit Our Office</h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Pick up claimed items at Room 100, Main Office.
               </p>
-              <Link href="/location" className="btn-secondary inline-block">
+              <Link href="/location" className="btn-secondary inline-block text-sm">
                 Get Directions
               </Link>
             </div>
