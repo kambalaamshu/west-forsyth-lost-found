@@ -36,7 +36,7 @@ const locations = [
   'Parking Lot B',
   'Auditorium',
   'Science Lab',
-  'Room 100 - Office',
+  'Front Office',
   'Room 112 - English',
   'Room 204 - Math',
   'Football Field',
@@ -188,7 +188,7 @@ export default function ReportPage() {
         image_url: imageUrl,
         ai_tags: allTags || null,
         contact_name: formData.contactName || 'Anonymous',
-        contact_email: formData.contactEmail || 'lostandfound@westforsyth.edu',
+        contact_email: formData.contactEmail || 'wfhslostandfound@forsyth.k12.ga.us',
       }
 
       const response = await fetch('/api/items', {
@@ -227,7 +227,7 @@ export default function ReportPage() {
             <div className="bg-gold/10 border-l-4 border-gold p-6 rounded-lg mb-8 text-left">
               <h3 className="font-bold mb-2">Next Steps:</h3>
               <ol className="list-decimal list-inside space-y-2 text-gray-700">
-                <li>Deliver the item to Lost & Found office (Room 100)</li>
+                <li>Deliver the item to the Lost & Found (front office)</li>
                 <li>The item is now visible in our searchable database</li>
                 <li>The owner can contact you via the email provided</li>
                 <li>Check back for claim requests</li>
@@ -624,7 +624,7 @@ export default function ReportPage() {
                     required
                   />
                   <span className="text-sm">
-                    I will deliver this item to the Lost & Found office (Room 100, Main Office) within 72 hours, or I have already done so.
+                    I will deliver this item to the Lost & Found (front office) within 72 hours, or I have already done so.
                   </span>
                 </label>
               </div>

@@ -37,7 +37,7 @@ export async function sendMatchNotification(params: SendMatchNotificationParams)
     return false
   }
 
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'lostandfound@westforsyth.edu'
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'wfhslostandfound@forsyth.k12.ga.us'
 
   // Format date
   const dateFound = new Date(matchedItem.date_found).toLocaleDateString('en-US', {
@@ -160,7 +160,7 @@ export async function sendMatchNotification(params: SendMatchNotificationParams)
                 <ol style="margin: 0; padding-left: 20px; color: #856404; font-size: 14px; line-height: 1.8;">
                   <li>Click the button above to submit a claim</li>
                   <li>Provide proof of ownership (describe unique features)</li>
-                  <li>Visit the Lost & Found office (Room 100) to pick up your item</li>
+                  <li>Visit the Lost & Found office (front office) to pick up your item</li>
                 </ol>
               </div>
 
@@ -178,7 +178,7 @@ export async function sendMatchNotification(params: SendMatchNotificationParams)
                 West Forsyth High School Lost & Found
               </p>
               <p style="color: #888; font-size: 12px; margin: 0;">
-                Room 100, Main Office | 770-888-3470
+                Front Office | 770-888-3470
               </p>
               <p style="color: #FFD700; font-size: 12px; margin: 10px 0 0 0;">
                 Go Wolverines!
@@ -217,13 +217,13 @@ ${claimUrl}
 NEXT STEPS:
 1. Click the link above to submit a claim
 2. Provide proof of ownership (describe unique features)
-3. Visit the Lost & Found office (Room 100) to pick up your item
+3. Visit the Lost & Found office (front office) to pick up your item
 
 If this isn't your item, you can ignore this email.
 
 ---
 West Forsyth High School Lost & Found
-Room 100, Main Office | 770-888-3470
+Front Office | 770-888-3470
 Go Wolverines!
   `
 

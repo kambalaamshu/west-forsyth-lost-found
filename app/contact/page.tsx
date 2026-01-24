@@ -191,7 +191,7 @@ export default function ContactPage() {
                   <h3 className="font-bold text-navy mb-2">Visit Us</h3>
                   <p className="text-gray-600">
                     Lost & Found Office<br />
-                    Room 100, Main Office<br />
+                    Front Office<br />
                     West Forsyth High School
                   </p>
                 </div>
@@ -199,7 +199,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold text-navy mb-2">Call Us</h3>
                   <p className="text-gray-600">
-                    (770) 781-6800 ext. 1234<br />
+                    (770) 888-3470<br />
                     Monday - Friday, 7:30 AM - 3:30 PM
                   </p>
                 </div>
@@ -207,7 +207,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold text-navy mb-2">Email Us</h3>
                   <p className="text-gray-600">
-                    lostandfound@forsyth.k12.ga.us<br />
+                    wfhslostandfound@forsyth.k12.ga.us<br />
                     Response time: Within 24 hours
                   </p>
                 </div>
@@ -218,7 +218,7 @@ export default function ContactPage() {
               <h3 className="font-bold text-lg mb-3">Before Contacting:</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>Check our <a href="/browse" className="text-navy underline">database</a> for your item</li>
-                <li>Review our <a href="/location" className="text-navy underline">FAQ section</a></li>
+                <li>Have details about your item ready</li>
                 <li>Have your item ID number ready (if applicable)</li>
                 <li>Check your email for previous responses</li>
               </ul>
@@ -237,7 +237,7 @@ export default function ContactPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="mt-12 grid md:grid-cols-3 gap-6">
+        <div className="mt-12 grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
           <a href="/report" className="card p-6 text-center hover:scale-105 transition-transform">
             <div className="text-4xl mb-3">📝</div>
             <h3 className="font-bold mb-2">Report Found Item</h3>
@@ -248,12 +248,6 @@ export default function ContactPage() {
             <div className="text-4xl mb-3">🔍</div>
             <h3 className="font-bold mb-2">Search Database</h3>
             <p className="text-sm text-gray-600">Browse all found items</p>
-          </a>
-
-          <a href="/location" className="card p-6 text-center hover:scale-105 transition-transform">
-            <div className="text-4xl mb-3">📍</div>
-            <h3 className="font-bold mb-2">Visit Office</h3>
-            <p className="text-sm text-gray-600">Get directions and hours</p>
           </a>
         </div>
       </div>
