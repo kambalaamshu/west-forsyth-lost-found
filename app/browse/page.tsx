@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Navigation from '@/components/Navigation'
-import { Search, MapPin, Calendar, Palette, Package, X, CheckCircle, Tag, Loader2 } from 'lucide-react'
+import { Search, MapPin, Calendar, Palette, Package, X, CheckCircle, Tag, Loader2, Upload, Image } from 'lucide-react'
 
 interface Item {
   id: number
@@ -50,6 +50,8 @@ function BrowsePageContent() {
   const [claimForm, setClaimForm] = useState({ name: '', email: '', studentId: '', description: '' })
   const [claimSubmitted, setClaimSubmitted] = useState(false)
   const [claimSubmitting, setClaimSubmitting] = useState(false)
+  const [proofImage, setProofImage] = useState<File | null>(null)
+  const [proofImagePreview, setProofImagePreview] = useState<string | null>(null)
 
   // Fetch items and categories
   useEffect(() => {
@@ -129,14 +131,45 @@ function BrowsePageContent() {
     setShowClaimModal(true)
     setClaimSubmitted(false)
     setClaimForm({ name: '', email: '', studentId: '', description: '' })
+    setProofImage(null)
+    setProofImagePreview(null)
+  }
+
+  const handleProofImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setProofImage(file)
+      setProofImagePreview(URL.createObjectURL(file))
+    }
   }
 
   const handleClaimSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!proofImage) {
+      alert('Please upload a proof of ownership image')
+      return
+    }
+
     setClaimSubmitting(true)
 
     // Submit claim to API
     try {
+      // Upload proof image first
+      let proofImageUrl: string | null = null
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', proofImage)
+
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+
+      if (uploadResponse.ok) {
+        const uploadData = await uploadResponse.json()
+        proofImageUrl = uploadData.url
+      }
+
       const response = await fetch('/api/claims', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -146,7 +179,7 @@ function BrowsePageContent() {
           claimant_name: claimForm.name,
           claimant_email: claimForm.email,
           student_id: claimForm.studentId || undefined,
-          description: claimForm.description,
+          description: claimForm.description + (proofImageUrl ? `\n\n[Proof Image: ${proofImageUrl}]` : ''),
         }),
       })
 
@@ -167,6 +200,8 @@ function BrowsePageContent() {
     setShowClaimModal(false)
     setClaimItem(null)
     setClaimSubmitted(false)
+    setProofImage(null)
+    setProofImagePreview(null)
   }
 
   return (
@@ -527,14 +562,59 @@ function BrowsePageContent() {
 
                   <div>
                     <label className="block text-sm font-semibold text-navy mb-1">
-                      Describe the Item (Proof of Ownership) *
+                      Upload Proof of Ownership *
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Upload a photo showing you with a similar item, a receipt, or other proof that this belongs to you.
+                    </p>
+                    <div className="border-2 border-dashed border-medium-gray rounded-lg p-4 text-center hover:border-gold transition-colors cursor-pointer">
+                      <label htmlFor="proof-upload" className="cursor-pointer">
+                        {proofImagePreview ? (
+                          <div className="relative inline-block">
+                            <img
+                              src={proofImagePreview}
+                              alt="Proof preview"
+                              className="max-h-32 rounded-lg mx-auto"
+                            />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setProofImage(null)
+                                setProofImagePreview(null)
+                              }}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <Image className="w-10 h-10 mx-auto mb-2 text-gray-400" />
+                            <p className="text-sm text-gray-600">Click to upload proof image</p>
+                          </>
+                        )}
+                        <input
+                          id="proof-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleProofImageChange}
+                          className="hidden"
+                          required
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-navy mb-1">
+                      Additional Description (Optional)
                     </label>
                     <textarea
-                      required
                       value={claimForm.description}
                       onChange={(e) => setClaimForm({ ...claimForm, description: e.target.value })}
-                      className="input-field min-h-[120px]"
-                      placeholder="Describe unique features, contents, or identifying marks that prove this item belongs to you..."
+                      className="input-field min-h-[80px]"
+                      placeholder="Describe unique features, contents, or identifying marks..."
                     />
                   </div>
                 </div>
