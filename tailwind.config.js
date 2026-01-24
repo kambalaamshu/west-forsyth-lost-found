@@ -17,7 +17,7 @@ module.exports = {
         'error-red': '#C8102E',
       },
       fontFamily: {
-        sans: ['Avenir', 'Avenir Next', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Avenir', 'Avenir Next', 'Nunito', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
     },
   },
