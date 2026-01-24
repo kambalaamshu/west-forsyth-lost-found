@@ -331,6 +331,14 @@ export function updateItemStatus(id: number, status: 'active' | 'claimed' | 'exp
 
 export function deleteItem(id: number): boolean {
   const database = getDb()
+
+  // Delete related claims first (foreign key constraint)
+  database.prepare('DELETE FROM claims WHERE item_id = ?').run(id)
+
+  // Delete related lost_searches (foreign key constraint)
+  database.prepare('UPDATE lost_searches SET matched_item_id = NULL WHERE matched_item_id = ?').run(id)
+
+  // Now delete the item
   const result = database.prepare('DELETE FROM items WHERE id = ?').run(id)
   return result.changes > 0
 }
