@@ -21,9 +21,11 @@ export default function Navigation() {
         <div className="flex justify-between items-center py-4">
           {/* Logo and Brand */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gold rounded-lg flex items-center justify-center font-bold text-navy text-xl">
-              WW
-            </div>
+            <img
+              src="/logo.png"
+              alt="Where at West Logo"
+              className="w-12 h-12 object-contain"
+            />
             <div>
               <h2 className="text-xl font-bold text-white">Where at West</h2>
               <p className="text-gold text-sm">Lost & Found</p>
