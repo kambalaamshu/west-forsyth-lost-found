@@ -73,7 +73,10 @@ export default function AdminItemsPage() {
     }
   }
 
+  const [deleting, setDeleting] = useState(false)
+
   const handleDelete = async (id: number) => {
+    setDeleting(true)
     try {
       const response = await fetch(`/api/items/${id}`, {
         method: 'DELETE'
@@ -82,9 +85,15 @@ export default function AdminItemsPage() {
       if (response.ok) {
         setItems(items.filter(item => item.id !== id))
         setDeleteConfirm(null)
+      } else {
+        const error = await response.json()
+        alert(`Failed to delete: ${error.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Failed to delete item:', error)
+      alert('Failed to delete item. Please try again.')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -352,13 +361,15 @@ export default function AdminItemsPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => handleDelete(deleteConfirm)}
-                className="flex-1 bg-red-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-700"
+                disabled={deleting}
+                className="flex-1 bg-red-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
-                Delete
+                {deleting ? 'Deleting...' : 'Delete'}
               </button>
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300"
+                disabled={deleting}
+                className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300 disabled:opacity-50"
               >
                 Cancel
               </button>
