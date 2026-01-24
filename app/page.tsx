@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Upload, MapPin, Camera } from 'lucide-react'
+import { Search, Upload, Camera } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -95,7 +95,7 @@ export default function Home() {
             Three simple steps to reunite lost items with their owners
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* Feature 1 - Lost Something */}
             <div className="card p-6 text-center hover:scale-105 transition-transform border-2 border-gold">
               <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center mx-auto mb-4">
@@ -135,20 +135,6 @@ export default function Home() {
               </p>
               <Link href="/browse" className="btn-secondary inline-block text-sm">
                 Browse
-              </Link>
-            </div>
-
-            {/* Feature 4 - Location */}
-            <div className="card p-6 text-center hover:scale-105 transition-transform">
-              <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="text-white" size={32} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Visit Our Office</h3>
-              <p className="text-gray-600 mb-4 text-sm">
-                Pick up claimed items at Room 100, Main Office.
-              </p>
-              <Link href="/location" className="btn-secondary inline-block text-sm">
-                Get Directions
               </Link>
             </div>
           </div>
