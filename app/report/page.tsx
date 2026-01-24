@@ -624,7 +624,7 @@ export default function ReportPage() {
                     required
                   />
                   <span className="text-sm">
-                    I will deliver this item to the Lost & Found office (Room 100, Main Office) within 24 hours, or I have already done so.
+                    I will deliver this item to the Lost & Found office (Room 100, Main Office) within 72 hours, or I have already done so.
                   </span>
                 </label>
               </div>
