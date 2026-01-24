@@ -152,25 +152,6 @@ export default function Home() {
               </Link>
             </div>
           </div>
-
-          {/* Impact Stats */}
-          <div className="mt-16 bg-light-gray rounded-xl p-12">
-            <h3 className="text-3xl font-bold text-center mb-8">Our Impact</h3>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gold mb-2">{stats.total}</div>
-                <div className="text-gray-600">Total Items Reported</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold text-green mb-2">{stats.claimed}</div>
-                <div className="text-gray-600">Items Claimed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold text-navy mb-2">{stats.successRate}%</div>
-                <div className="text-gray-600">Success Rate</div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
