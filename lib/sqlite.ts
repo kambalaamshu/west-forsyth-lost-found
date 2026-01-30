@@ -1,8 +1,10 @@
 import Database from 'better-sqlite3'
 import path from 'path'
 
-// Database file location
-const dbPath = path.join(process.cwd(), 'lost-found.db')
+// Database file location - use /app/data volume on Railway, otherwise use project root
+const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH
+  ? path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH, 'lost-found.db')
+  : path.join(process.cwd(), 'lost-found.db')
 
 // Initialize database connection
 let db: Database.Database | null = null
