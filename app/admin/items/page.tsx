@@ -155,6 +155,7 @@ export default function AdminItemsPage() {
           className="px-4 py-2 border rounded-lg focus:outline-none focus:border-navy"
         >
           <option value="all">All Status</option>
+          <option value="pending">Pending</option>
           <option value="active">Active</option>
           <option value="claimed">Claimed</option>
           <option value="expired">Expired</option>
@@ -203,11 +204,13 @@ export default function AdminItemsPage() {
                       value={item.status}
                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                       className={`px-2 py-1 rounded text-xs font-semibold border-0 cursor-pointer ${
+                        item.status === 'pending' ? 'bg-orange-100 text-orange-600' :
                         item.status === 'active' ? 'bg-green/10 text-green' :
                         item.status === 'claimed' ? 'bg-gold/20 text-gold' :
                         'bg-gray-100 text-gray-600'
                       }`}
                     >
+                      <option value="pending">Pending</option>
                       <option value="active">Active</option>
                       <option value="claimed">Claimed</option>
                       <option value="expired">Expired</option>
@@ -327,6 +330,7 @@ export default function AdminItemsPage() {
                   onChange={(e) => setEditingItem({ ...editingItem, status: e.target.value })}
                   className="input-field"
                 >
+                  <option value="pending">Pending</option>
                   <option value="active">Active</option>
                   <option value="claimed">Claimed</option>
                   <option value="expired">Expired</option>

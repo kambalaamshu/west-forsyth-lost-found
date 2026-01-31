@@ -228,7 +228,7 @@ export default function ReportPage() {
               <h3 className="font-bold mb-2">Next Steps:</h3>
               <ol className="list-decimal list-inside space-y-2 text-gray-700">
                 <li>Deliver the item to the Lost & Found (front office)</li>
-                <li>The item is now visible in our searchable database</li>
+                <li>Your item is pending admin approval and will appear in our database once reviewed</li>
                 <li>The owner can contact you via the email provided</li>
                 <li>Check back for claim requests</li>
               </ol>
@@ -637,7 +637,7 @@ export default function ReportPage() {
                   {loading ? 'Submitting...' : 'Submit Found Item'}
                 </button>
                 <p className="text-sm text-gray-500 text-center">
-                  Your item will be immediately visible in our database
+                  Your item will be reviewed by an admin before appearing in our database
                 </p>
               </div>
             </div>

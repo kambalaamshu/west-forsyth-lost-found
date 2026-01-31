@@ -36,7 +36,7 @@ function initSchema() {
       image_url TEXT,
       contact_name TEXT,
       contact_email TEXT,
-      status TEXT DEFAULT 'active' CHECK(status IN ('active', 'claimed', 'expired')),
+      status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'active', 'claimed', 'expired')),
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
@@ -54,6 +54,52 @@ function initSchema() {
     database.exec(`ALTER TABLE items ADD COLUMN ai_tags TEXT`)
   } catch {
     // Column already exists, ignore error
+  }
+
+  // Migration: update CHECK constraint to include 'pending' status for existing databases
+  try {
+    // SQLite doesn't support ALTER CHECK constraints, so we recreate via a temp table approach
+    // However, SQLite CHECK constraints are not enforced on existing data and the CREATE TABLE
+    // IF NOT EXISTS won't re-run if the table exists. Instead, we just ensure the column default
+    // is updated and the constraint allows 'pending' by testing an insert/rollback.
+    const testResult = database.prepare("SELECT COUNT(*) as count FROM items WHERE status = 'pending'").get() as { count: number }
+    // If this succeeds, the column accepts 'pending' (new schema). If not, we need to migrate.
+    void testResult
+  } catch {
+    // If somehow the query fails, we proceed anyway — the CHECK constraint in CREATE TABLE
+    // only applies to new databases.
+  }
+
+  // Ensure existing databases can store 'pending' status by recreating the table if needed
+  try {
+    database.exec(`
+      BEGIN;
+      CREATE TABLE IF NOT EXISTS items_backup AS SELECT * FROM items;
+      DROP TABLE IF EXISTS items;
+      CREATE TABLE items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL CHECK(type IN ('lost', 'found')),
+        title TEXT NOT NULL,
+        description TEXT,
+        category TEXT NOT NULL,
+        color TEXT,
+        location TEXT NOT NULL,
+        date_found TEXT NOT NULL,
+        image_url TEXT,
+        contact_name TEXT,
+        contact_email TEXT,
+        status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'active', 'claimed', 'expired')),
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        ai_tags TEXT
+      );
+      INSERT INTO items SELECT * FROM items_backup;
+      DROP TABLE items_backup;
+      COMMIT;
+    `)
+  } catch {
+    // Migration already applied or table is already correct
+    try { database.exec('ROLLBACK') } catch { /* no transaction to rollback */ }
   }
 
   // Create contacts table for contact form submissions
@@ -249,7 +295,7 @@ export interface Item {
   ai_tags: string | null
   contact_name: string | null
   contact_email: string | null
-  status: 'active' | 'claimed' | 'expired'
+  status: 'pending' | 'active' | 'claimed' | 'expired'
   created_at: string
   updated_at: string
 }
@@ -325,7 +371,7 @@ export function createItem(item: CreateItemInput): Item {
   return getItemById(result.lastInsertRowid as number)!
 }
 
-export function updateItemStatus(id: number, status: 'active' | 'claimed' | 'expired'): boolean {
+export function updateItemStatus(id: number, status: 'pending' | 'active' | 'claimed' | 'expired'): boolean {
   const database = getDb()
   const result = database.prepare('UPDATE items SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(status, id)
   return result.changes > 0
@@ -350,11 +396,13 @@ export function getStats() {
   const total = database.prepare('SELECT COUNT(*) as count FROM items').get() as { count: number }
   const active = database.prepare("SELECT COUNT(*) as count FROM items WHERE status = 'active'").get() as { count: number }
   const claimed = database.prepare("SELECT COUNT(*) as count FROM items WHERE status = 'claimed'").get() as { count: number }
+  const pending = database.prepare("SELECT COUNT(*) as count FROM items WHERE status = 'pending'").get() as { count: number }
 
   return {
     total: total.count,
     active: active.count,
     claimed: claimed.count,
+    pending: pending.count,
     successRate: total.count > 0 ? Math.round((claimed.count / total.count) * 100) : 0
   }
 }

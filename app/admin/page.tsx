@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Package, CheckCircle, Clock, TrendingUp, ArrowRight } from 'lucide-react'
+import { Package, CheckCircle, Clock, TrendingUp, ArrowRight, AlertCircle } from 'lucide-react'
 
 interface Stats {
   total: number
   active: number
   claimed: number
+  pending: number
   categories: string[]
   recentItems: Array<{
     id: number
@@ -71,7 +72,7 @@ export default function AdminDashboard() {
       <h1 className="text-3xl font-bold text-navy mb-8">Dashboard</h1>
 
       {/* Stats Cards */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-navy/10 p-3 rounded-lg">
@@ -82,6 +83,17 @@ export default function AdminDashboard() {
           <h3 className="font-semibold text-gray-700">Total Items</h3>
           <p className="text-sm text-gray-500">All time</p>
         </div>
+
+        <Link href="/admin/items" className="bg-white rounded-xl shadow p-6 hover:shadow-md transition-shadow border-2 border-transparent hover:border-orange-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="bg-orange-100 p-3 rounded-lg">
+              <AlertCircle className="text-orange-500" size={24} />
+            </div>
+            <span className="text-3xl font-bold text-orange-500">{stats?.pending || 0}</span>
+          </div>
+          <h3 className="font-semibold text-gray-700">Pending Items</h3>
+          <p className="text-sm text-gray-500">Awaiting approval</p>
+        </Link>
 
         <div className="bg-white rounded-xl shadow p-6">
           <div className="flex items-center justify-between mb-4">
@@ -136,7 +148,9 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
-                      item.status === 'active' ? 'bg-green/10 text-green' : 'bg-gold/20 text-gold'
+                      item.status === 'pending' ? 'bg-orange-100 text-orange-600' :
+                      item.status === 'active' ? 'bg-green/10 text-green' :
+                      'bg-gold/20 text-gold'
                     }`}>
                       {item.status}
                     </span>
