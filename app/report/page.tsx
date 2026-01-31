@@ -187,8 +187,8 @@ export default function ReportPage() {
         date_found: formData.dateFound,
         image_url: imageUrl,
         ai_tags: allTags || null,
-        contact_name: formData.contactName || 'Anonymous',
-        contact_email: formData.contactEmail || 'wfhslostandfound@forsyth.k12.ga.us',
+        contact_name: formData.contactName,
+        contact_email: formData.contactEmail,
       }
 
       const response = await fetch('/api/items', {
@@ -577,7 +577,7 @@ export default function ReportPage() {
                 <span className="inline-block w-8 h-8 bg-gold text-navy rounded-full text-center mr-3">
                   4
                 </span>
-                Your Contact Info (Optional)
+                Your Contact Info
               </h3>
 
               <div className="space-y-4">
@@ -589,6 +589,7 @@ export default function ReportPage() {
                     type="text"
                     className="input-field"
                     placeholder="e.g., John Smith"
+                    required
                     value={formData.contactName}
                     onChange={(e) => setFormData(prev => ({ ...prev, contactName: e.target.value }))}
                   />
@@ -602,12 +603,10 @@ export default function ReportPage() {
                     type="email"
                     className="input-field"
                     placeholder="e.g., john.smith@forsyth.k12.ga.us"
+                    required
                     value={formData.contactEmail}
                     onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
                   />
-                  <p className="text-sm text-gray-500 mt-1">
-                    If left blank, inquiries will go to the Lost & Found office
-                  </p>
                 </div>
               </div>
             </div>
