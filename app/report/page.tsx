@@ -583,7 +583,7 @@ export default function ReportPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block font-semibold mb-2">
-                    Your Name
+                    Your Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -597,7 +597,7 @@ export default function ReportPage() {
 
                 <div>
                   <label className="block font-semibold mb-2">
-                    Your Email
+                    Your Email <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
