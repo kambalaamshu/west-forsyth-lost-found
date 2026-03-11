@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Navigation from '@/components/Navigation'
 import { Upload, CheckCircle, AlertCircle, Sparkles, X, Loader2 } from 'lucide-react'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '@/lib/firebase'
 
 // Analysis result interface matching the server-side API
 interface ImageAnalysisResult {
@@ -148,21 +150,17 @@ export default function ReportPage() {
     setError(null)
 
     try {
-      // Upload photo if provided
+      // Upload photo to Firebase Storage
       let imageUrl: string | null = null
       if (photos.length > 0) {
-        const uploadFormData = new FormData()
-        uploadFormData.append('file', photos[0])
-
-        const uploadResponse = await fetch('/api/upload', {
-          method: 'POST',
-          body: uploadFormData,
-        })
-
-        if (uploadResponse.ok) {
-          const uploadData = await uploadResponse.json()
-          imageUrl = uploadData.url
-        }
+        const file = photos[0]
+        const timestamp = Date.now()
+        const randomString = Math.random().toString(36).substring(2, 8)
+        const extension = file.name.split('.').pop() || 'jpg'
+        const filename = `uploads/${timestamp}-${randomString}.${extension}`
+        const storageRef = ref(storage, filename)
+        await uploadBytes(storageRef, file)
+        imageUrl = await getDownloadURL(storageRef)
       }
 
       // Build the location string
