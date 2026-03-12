@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search, Upload, Camera } from 'lucide-react'
 import Navigation from '@/components/Navigation'
+import AnimateOnScroll from '@/components/AnimateOnScroll'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -97,46 +98,52 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Feature 1 - Lost Something */}
-            <div className="card p-6 text-center hover:scale-105 transition-transform border-2 border-gold">
-              <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center mx-auto mb-4">
-                <Camera className="text-navy" size={32} />
+            <AnimateOnScroll delay={0}>
+              <div className="card p-6 text-center border-2 border-gold h-full">
+                <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110">
+                  <Camera className="text-navy" size={32} />
+                </div>
+                <h3 className="text-xl font-bold mb-3">I Lost Something</h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  Upload a photo and let AI find your item in our database.
+                </p>
+                <Link href="/search" className="btn-primary inline-block text-sm">
+                  Find My Item
+                </Link>
               </div>
-              <h3 className="text-xl font-bold mb-3">I Lost Something</h3>
-              <p className="text-gray-600 mb-4 text-sm">
-                Upload a photo and let AI find your item in our database.
-              </p>
-              <Link href="/search" className="btn-primary inline-block text-sm">
-                Find My Item
-              </Link>
-            </div>
+            </AnimateOnScroll>
 
             {/* Feature 2 - Report Found */}
-            <div className="card p-6 text-center hover:scale-105 transition-transform">
-              <div className="w-16 h-16 bg-green rounded-full flex items-center justify-center mx-auto mb-4">
-                <Upload className="text-white" size={32} />
+            <AnimateOnScroll delay={150}>
+              <div className="card p-6 text-center h-full">
+                <div className="w-16 h-16 bg-green rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Upload className="text-white" size={32} />
+                </div>
+                <h3 className="text-xl font-bold mb-3">I Found Something</h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  Report a found item and help reunite it with its owner.
+                </p>
+                <Link href="/report" className="btn-secondary inline-block text-sm">
+                  Report Item
+                </Link>
               </div>
-              <h3 className="text-xl font-bold mb-3">I Found Something</h3>
-              <p className="text-gray-600 mb-4 text-sm">
-                Report a found item and help reunite it with its owner.
-              </p>
-              <Link href="/report" className="btn-secondary inline-block text-sm">
-                Report Item
-              </Link>
-            </div>
+            </AnimateOnScroll>
 
             {/* Feature 3 - Search */}
-            <div className="card p-6 text-center hover:scale-105 transition-transform">
-              <div className="w-16 h-16 bg-navy rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="text-gold" size={32} />
+            <AnimateOnScroll delay={300}>
+              <div className="card p-6 text-center h-full">
+                <div className="w-16 h-16 bg-navy rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="text-gold" size={32} />
+                </div>
+                <h3 className="text-xl font-bold mb-3">Browse All Items</h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  Manually search all found items by category and date.
+                </p>
+                <Link href="/browse" className="btn-secondary inline-block text-sm">
+                  Browse
+                </Link>
               </div>
-              <h3 className="text-xl font-bold mb-3">Browse All Items</h3>
-              <p className="text-gray-600 mb-4 text-sm">
-                Manually search all found items by category and date.
-              </p>
-              <Link href="/browse" className="btn-secondary inline-block text-sm">
-                Browse
-              </Link>
-            </div>
+            </AnimateOnScroll>
           </div>
         </div>
       </section>

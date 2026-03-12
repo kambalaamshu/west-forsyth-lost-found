@@ -296,15 +296,16 @@ function BrowsePageContent() {
             ) : (
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredItems.map((item) => (
+                  {filteredItems.map((item, idx) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden border-2 border-transparent hover:border-gold cursor-pointer"
+                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden border-2 border-transparent hover:border-gold cursor-pointer animate-fade-in"
+                      style={{ animationDelay: `${(idx % 9) * 60}ms` }}
                       onClick={() => setSelectedItem(item)}
                     >
                       {/* Item Image/Icon */}
                       {item.image_url ? (
-                        <div className="h-40 overflow-hidden">
+                        <div className="h-40 img-zoom">
                           <img
                             src={item.image_url}
                             alt={item.title}
@@ -312,7 +313,7 @@ function BrowsePageContent() {
                           />
                         </div>
                       ) : (
-                        <div className="h-40 bg-gradient-to-br from-navy to-green flex items-center justify-center text-6xl">
+                        <div className="h-40 bg-gradient-to-br from-navy to-green flex items-center justify-center text-6xl transition-transform duration-300 hover:scale-105">
                           {categoryIcons[item.category] || '📦'}
                         </div>
                       )}
@@ -353,7 +354,7 @@ function BrowsePageContent() {
                         )}
 
                         <button
-                          className="mt-4 w-full bg-navy text-gold font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors"
+                          className="mt-4 w-full bg-navy text-gold font-semibold py-2 px-4 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
                           onClick={(e) => {
                             e.stopPropagation()
                             setSelectedItem(item)
@@ -391,7 +392,7 @@ function BrowsePageContent() {
           >
             {/* Modal Header */}
             {selectedItem.image_url ? (
-              <div className="h-48 overflow-hidden">
+              <div className="h-48 img-zoom">
                 <img
                   src={selectedItem.image_url}
                   alt={selectedItem.title}

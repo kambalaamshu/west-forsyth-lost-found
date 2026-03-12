@@ -21,20 +21,110 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--navy);
 }
 
+/* ===================== KEYFRAMES ===================== */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes clickBounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.93); }
+  70%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+/* ===================== ANIMATION UTILITIES ===================== */
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.55s ease forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* ===================== BUTTONS ===================== */
+
 @layer components {
   .btn-primary {
-    @apply bg-navy text-gold font-bold py-3 px-6 rounded-lg transition-all hover:bg-opacity-90 hover:-translate-y-0.5;
+    @apply bg-navy text-gold font-bold py-3 px-6 rounded-lg
+           transition-all duration-200
+           hover:scale-105 hover:shadow-lg
+           active:scale-95;
   }
 
   .btn-secondary {
-    @apply bg-green text-white font-bold py-3 px-6 rounded-lg transition-all hover:bg-opacity-90 hover:-translate-y-0.5;
+    @apply bg-green text-white font-bold py-3 px-6 rounded-lg
+           transition-all duration-200
+           hover:scale-105 hover:shadow-lg
+           active:scale-95;
   }
+
+  /* ===================== INPUTS ===================== */
 
   .input-field {
-    @apply w-full px-4 py-3 border-2 border-medium-gray rounded-lg focus:outline-none focus:border-gold transition-colors;
+    @apply w-full px-4 py-3 border-2 border-medium-gray rounded-lg
+           focus:outline-none focus:border-gold transition-colors duration-200;
   }
 
+  /* ===================== CARDS ===================== */
+
   .card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-all;
+    @apply bg-white rounded-xl shadow-md transition-all duration-300
+           hover:-translate-y-2 hover:shadow-xl;
+  }
+
+  /* ===================== IMAGE ZOOM ===================== */
+
+  .img-zoom {
+    @apply overflow-hidden;
+  }
+
+  .img-zoom img {
+    @apply transition-transform duration-500 ease-in-out;
+  }
+
+  .img-zoom:hover img {
+    @apply scale-110;
+  }
+
+  /* ===================== NAV LINK UNDERLINE SLIDE ===================== */
+
+  .nav-link {
+    @apply relative px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--gold);
+    transition: width 0.25s ease, left 0.25s ease;
+    border-radius: 2px;
+  }
+
+  .nav-link:hover::after {
+    width: 60%;
+    left: 20%;
+  }
+
+  .nav-link:hover {
+    @apply bg-gold text-navy;
   }
 }
