@@ -43,7 +43,7 @@ export default function Home() {
       <section className="bg-gradient-to-br from-navy to-green text-white py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
-            Lost Something? We&apos;re Here to Help
+            Lost Something?
           </h1>
           <p className="text-xl mb-8 text-gray-100">
             Search our database of found items or report what you&apos;ve found

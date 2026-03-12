@@ -89,7 +89,7 @@ export default function ContactPage() {
       <div className="max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-4 text-center">Contact Us</h1>
         <p className="text-xl text-gray-600 text-center mb-12">
-          Have questions? We&apos;re here to help!
+          Help
         </p>
 
         <div className="grid md:grid-cols-2 gap-8">
