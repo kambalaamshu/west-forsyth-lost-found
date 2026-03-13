@@ -550,10 +550,11 @@ function BrowsePageContent() {
 
                   <div>
                     <label className="block text-sm font-semibold text-navy mb-1">
-                      Student ID (if applicable)
+                      Student ID *
                     </label>
                     <input
                       type="text"
+                      required
                       value={claimForm.studentId}
                       onChange={(e) => setClaimForm({ ...claimForm, studentId: e.target.value })}
                       className="input-field"
@@ -609,7 +610,7 @@ function BrowsePageContent() {
 
                   <div>
                     <label className="block text-sm font-semibold text-navy mb-1">
-                      Additional Description (Optional)
+                      Additional Information
                     </label>
                     <textarea
                       value={claimForm.description}
