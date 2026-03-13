@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
     if (process.env.SENDGRID_API_KEY) {
       const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'whereatwestforsythhs@gmail.com'
       const adminEmail = process.env.SENDGRID_FROM_EMAIL || 'whereatwestforsythhs@gmail.com'
+      console.log('[SendGrid] Sending claim emails. From:', fromEmail, 'Admin:', adminEmail, 'Claimant:', body.claimant_email)
 
       // Email to admin
       await sgMail.send({
@@ -97,9 +98,14 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    console.log('[SendGrid] Emails sent successfully for claim', claim.id)
     return NextResponse.json(claim, { status: 201 })
   } catch (error) {
     console.error('Error creating claim:', error)
+    if (error && typeof error === 'object' && 'response' in error) {
+      const sgError = error as { response?: { body?: unknown } }
+      console.error('[SendGrid] Error response:', JSON.stringify(sgError.response?.body))
+    }
     return NextResponse.json({ error: 'Failed to create claim' }, { status: 500 })
   }
 }
